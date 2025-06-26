@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JavaScript Events Demonstration</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .section {
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 20px;
+            background-color: #f9f9f9;
+        }
+        .event-display {
+            min-height: 50px;
+            padding: 10px;
+            margin: 10px 0;
+            background-color: #fff;
+            border: 1px dashed #ccc;
+            border-radius: 3px;
+        }
+        .highlight {
+            background-color: yellow;
+            transition: background-color 0.3s;
+        }
+        #mouseBox {
+            width: 200px;
+            height: 100px;
+            background-color: lightblue;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 10px 0;
+        }
+        #keyInput {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+        }
+        .form-group {
+            margin-bottom: 10px;
+        }
+        button {
+            padding: 8px 15px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        #countdown {
+            font-size: 24px;
+            font-weight: bold;
+            color: #d9534f;
+        }
+    </style>
+</head>
+<body>
+    <h1>JavaScript Events Demonstration</h1>
+
+    <!-- Mouse Events Section -->
+    <div class="section">
+        <h2>Mouse Events</h2>
+        <div id="mouseBox">Mouse Interaction Area</div>
+        <div class="event-display" id="mouseEvents"></div>
+        <p>Try: click, double-click, right-click, mouseover, mouseout, mousemove</p>
+    </div>
+
+    <!-- Keyboard Events Section -->
+    <div class="section">
+        <h2>Keyboard Events</h2>
+        <input type="text" id="keyInput" placeholder="Type here...">
+        <div class="event-display" id="keyboardEvents"></div>
+        <p>Try: keydown, keyup, keypress</p>
+    </div>
+
+    <!-- Form Events Section -->
+    <div class="section">
+        <h2>Form Events</h2>
+        <form id="demoForm">
+            <div class="form-group">
+                <label for="name">Name:</label>
+                <input type="text" id="name" name="name">
+            </div>
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email">
+            </div>
+            <div class="form-group">
+                <label>
+                    <input type="checkbox" id="subscribe" name="subscribe"> Subscribe to newsletter
+                </label>
+            </div>
+            <button type="submit">Submit</button>
+            <button type="reset">Reset</button>
+        </form>
+        <div class="event-display" id="formEvents"></div>
+    </div>
+
+    <!-- Page Events Section -->
+    <div class="section">
+        <h2>Page Events</h2>
+        <div class="event-display" id="pageEvents"></div>
+        <button id="resizeBtn">Simulate Resize</button>
+        <button id="scrollBtn">Scroll to Bottom</button>
+    </div>
+
+    <!-- Timer & Redirect Section -->
+    <div class="section">
+        <h2>Timer & Redirect</h2>
+        <div id="countdown">5</div>
+        <p>Page will redirect after countdown completes</p>
+        <button id="cancelRedirect">Cancel Redirect</button>
+        <div class="event-display" id="timerEvents"></div>
+    </div>
+
+    <script>
+        // ========== Mouse Events ==========
+        const mouseBox = document.getElementById('mouseBox');
+        const mouseEventsDisplay = document.getElementById('mouseEvents');
+
+        mouseBox.addEventListener('click', (e) => {
+            logEvent(mouseEventsDisplay, `Clicked at (${e.clientX}, ${e.clientY})`);
+            e.target.classList.add('highlight');
+            setTimeout(() => e.target.classList.remove('highlight'), 300);
+        });
+
+        mouseBox.addEventListener('dblclick', () => {
+            logEvent(mouseEventsDisplay, 'Double clicked');
+        });
+
+        mouseBox.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+            logEvent(mouseEventsDisplay, 'Right clicked');
+        });
+
+        mouseBox.addEventListener('mouseover', () => {
+            logEvent(mouseEventsDisplay, 'Mouse entered');
+        });
+
+        mouseBox.addEventListener('mouseout', () => {
+            logEvent(mouseEventsDisplay, 'Mouse left');
+        });
+
+        mouseBox.addEventListener('mousemove', (e) => {
+            // Throttle mousemove events for performance
+            if (!mouseBox.dataset.lastMove || Date.now() - mouseBox.dataset.lastMove > 100) {
+                logEvent(mouseEventsDisplay, `Mouse moving at (${e.clientX}, ${e.clientY})`);
+                mouseBox.dataset.lastMove = Date.now();
+            }
+        });
+
+        // ========== Keyboard Events ==========
+        const keyInput = document.getElementById('keyInput');
+        const keyboardEventsDisplay = document.getElementById('keyboardEvents');
+
+        keyInput.addEventListener('keydown', (e) => {
+            logEvent(keyboardEventsDisplay, `Key DOWN: ${e.key} (Code: ${e.code})`);
+        });
+
+        keyInput.addEventListener('keyup', (e) => {
+            logEvent(keyboardEventsDisplay, `Key UP: ${e.key} (Code: ${e.code})`);
+        });
+
+        keyInput.addEventListener('keypress', (e) => {
+            logEvent(keyboardEventsDisplay, `Key PRESS: ${e.key} (CharCode: ${e.charCode})`);
+        });
+
+        // ========== Form Events ==========
+        const demoForm = document.getElementById('demoForm');
+        const formEventsDisplay = document.getElementById('formEvents');
+
+        demoForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            logEvent(formEventsDisplay, 'Form submitted');
+            // Simulate form processing
+            setTimeout(() => {
+                logEvent(formEventsDisplay, 'Form processed successfully!');
+                demoForm.reset();
+            }, 1000);
+        });
+
+        demoForm.addEventListener('reset', () => {
+            logEvent(formEventsDisplay, 'Form reset');
+        });
+
+        demoForm.addEventListener('change', (e) => {
+            logEvent(formEventsDisplay, `Field changed: ${e.target.name}`);
+        });
+
+        demoForm.addEventListener('focusin', (e) => {
+            logEvent(formEventsDisplay, `Field focused: ${e.target.name}`);
+            e.target.style.backgroundColor = '#ffffcc';
+        });
+
+        demoForm.addEventListener('focusout', (e) => {
+            e.target.style.backgroundColor = '';
+        });
+
+        // ========== Page Events ==========
+        const pageEventsDisplay = document.getElementById('pageEvents');
+
+        window.addEventListener('load', () => {
+            logEvent(pageEventsDisplay, 'Page fully loaded');
+        });
+
+        window.addEventListener('resize', () => {
+            logEvent(pageEventsDisplay, 
+                `Window resized to: ${window.innerWidth}×${window.innerHeight}`);
+        });
+
+        window.addEventListener('scroll', () => {
+            // Throttle scroll events
+            if (!window.scrollTimeout) {
+                logEvent(pageEventsDisplay, 
+                    `Scrolled to: ${window.scrollY}px from top`);
+                window.scrollTimeout = setTimeout(() => {
+                    window.scrollTimeout = null;
+                }, 200);
+            }
+        });
+
+        document.getElementById('resizeBtn').addEventListener('click', () => {
+            window.dispatchEvent(new Event('resize'));
+        });
+
+        document.getElementById('scrollBtn').addEventListener('click', () => {
+            window.scrollTo(0, document.body.scrollHeight);
+        });
+
+        // ========== Timer & Redirect ==========
+        const countdownElement = document.getElementById('countdown');
+        const timerEventsDisplay = document.getElementById('timerEvents');
+        let countdown = 5;
+        let redirectTimer;
+
+        function startCountdown() {
+            logEvent(timerEventsDisplay, 'Countdown started (5 seconds)');
+            redirectTimer = setInterval(() => {
+                countdown--;
+                countdownElement.textContent = countdown;
+                
+                if (countdown <= 0) {
+                    clearInterval(redirectTimer);
+                    logEvent(timerEventsDisplay, 'Redirecting now...');
+                    // In a real scenario, you would redirect:
+                    // window.location.href = 'https://example.com';
+                    logEvent(timerEventsDisplay, 'Redirect would happen here (commented out for demo)');
+                    countdownElement.textContent = 'Redirect!';
+                }
+            }, 1000);
+        }
+
+        document.getElementById('cancelRedirect').addEventListener('click', () => {
+            clearInterval(redirectTimer);
+            logEvent(timerEventsDisplay, 'Redirect cancelled');
+            countdownElement.textContent = 'Cancelled';
+        });
+
+        // Start countdown after page loads
+        window.addEventListener('load', startCountdown);
+
+        // ========== Utility Function ==========
+        function logEvent(element, message) {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString();
+            const eventEntry = document.createElement('div');
+            eventEntry.textContent = `[${timeString}] ${message}`;
+            element.prepend(eventEntry);
+            
+            // Keep only the last 5 events visible
+            while (element.children.length > 5) {
+                element.removeChild(element.lastChild);
+            }
+        }
+    </script>
+</body>
+</html><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JavaScript Events Demonstration</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .section {
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 20px;
+            background-color: #f9f9f9;
+        }
+        .event-display {
+            min-height: 50px;
+            padding: 10px;
+            margin: 10px 0;
+            background-color: #fff;
+            border: 1px dashed #ccc;
+            border-radius: 3px;
+        }
+        .highlight {
+            background-color: yellow;
+            transition: background-color 0.3s;
+        }
+        #mouseBox {
+            width: 200px;
+            height: 100px;
+            background-color: lightblue;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 10px 0;
+        }
+        #keyInput {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+        }
+        .form-group {
+            margin-bottom: 10px;
+        }
+        button {
+            padding: 8px 15px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        #countdown {
+            font-size: 24px;
+            font-weight: bold;
+            color: #d9534f;
+        }
+    </style>
+</head>
+<body>
+    <h1>JavaScript Events Demonstration</h1>
+
+    <!-- Mouse Events Section -->
+    <div class="section">
+        <h2>Mouse Events</h2>
+        <div id="mouseBox">Mouse Interaction Area</div>
+        <div class="event-display" id="mouseEvents"></div>
+        <p>Try: click, double-click, right-click, mouseover, mouseout, mousemove</p>
+    </div>
+
+    <!-- Keyboard Events Section -->
+    <div class="section">
+        <h2>Keyboard Events</h2>
+        <input type="text" id="keyInput" placeholder="Type here...">
+        <div class="event-display" id="keyboardEvents"></div>
+        <p>Try: keydown, keyup, keypress</p>
+    </div>
+
+    <!-- Form Events Section -->
+    <div class="section">
+        <h2>Form Events</h2>
+        <form id="demoForm">
+            <div class="form-group">
+                <label for="name">Name:</label>
+                <input type="text" id="name" name="name">
+            </div>
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email">
+            </div>
+            <div class="form-group">
+                <label>
+                    <input type="checkbox" id="subscribe" name="subscribe"> Subscribe to newsletter
+                </label>
+            </div>
+            <button type="submit">Submit</button>
+            <button type="reset">Reset</button>
+        </form>
+        <div class="event-display" id="formEvents"></div>
+    </div>
+
+    <!-- Page Events Section -->
+    <div class="section">
+        <h2>Page Events</h2>
+        <div class="event-display" id="pageEvents"></div>
+        <button id="resizeBtn">Simulate Resize</button>
+        <button id="scrollBtn">Scroll to Bottom</button>
+    </div>
+
+    <!-- Timer & Redirect Section -->
+    <div class="section">
+        <h2>Timer & Redirect</h2>
+        <div id="countdown">5</div>
+        <p>Page will redirect after countdown completes</p>
+        <button id="cancelRedirect">Cancel Redirect</button>
+        <div class="event-display" id="timerEvents"></div>
+    </div>
+
+    <script>
+        // ========== Mouse Events ==========
+        const mouseBox = document.getElementById('mouseBox');
+        const mouseEventsDisplay = document.getElementById('mouseEvents');
+
+        mouseBox.addEventListener('click', (e) => {
+            logEvent(mouseEventsDisplay, `Clicked at (${e.clientX}, ${e.clientY})`);
+            e.target.classList.add('highlight');
+            setTimeout(() => e.target.classList.remove('highlight'), 300);
+        });
+
+        mouseBox.addEventListener('dblclick', () => {
+            logEvent(mouseEventsDisplay, 'Double clicked');
+        });
+
+        mouseBox.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+            logEvent(mouseEventsDisplay, 'Right clicked');
+        });
+
+        mouseBox.addEventListener('mouseover', () => {
+            logEvent(mouseEventsDisplay, 'Mouse entered');
+        });
+
+        mouseBox.addEventListener('mouseout', () => {
+            logEvent(mouseEventsDisplay, 'Mouse left');
+        });
+
+        mouseBox.addEventListener('mousemove', (e) => {
+            // Throttle mousemove events for performance
+            if (!mouseBox.dataset.lastMove || Date.now() - mouseBox.dataset.lastMove > 100) {
+                logEvent(mouseEventsDisplay, `Mouse moving at (${e.clientX}, ${e.clientY})`);
+                mouseBox.dataset.lastMove = Date.now();
+            }
+        });
+
+        // ========== Keyboard Events ==========
+        const keyInput = document.getElementById('keyInput');
+        const keyboardEventsDisplay = document.getElementById('keyboardEvents');
+
+        keyInput.addEventListener('keydown', (e) => {
+            logEvent(keyboardEventsDisplay, `Key DOWN: ${e.key} (Code: ${e.code})`);
+        });
+
+        keyInput.addEventListener('keyup', (e) => {
+            logEvent(keyboardEventsDisplay, `Key UP: ${e.key} (Code: ${e.code})`);
+        });
+
+        keyInput.addEventListener('keypress', (e) => {
+            logEvent(keyboardEventsDisplay, `Key PRESS: ${e.key} (CharCode: ${e.charCode})`);
+        });
+
+        // ========== Form Events ==========
+        const demoForm = document.getElementById('demoForm');
+        const formEventsDisplay = document.getElementById('formEvents');
+
+        demoForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            logEvent(formEventsDisplay, 'Form submitted');
+            // Simulate form processing
+            setTimeout(() => {
+                logEvent(formEventsDisplay, 'Form processed successfully!');
+                demoForm.reset();
+            }, 1000);
+        });
+
+        demoForm.addEventListener('reset', () => {
+            logEvent(formEventsDisplay, 'Form reset');
+        });
+
+        demoForm.addEventListener('change', (e) => {
+            logEvent(formEventsDisplay, `Field changed: ${e.target.name}`);
+        });
+
+        demoForm.addEventListener('focusin', (e) => {
+            logEvent(formEventsDisplay, `Field focused: ${e.target.name}`);
+            e.target.style.backgroundColor = '#ffffcc';
+        });
+
+        demoForm.addEventListener('focusout', (e) => {
+            e.target.style.backgroundColor = '';
+        });
+
+        // ========== Page Events ==========
+        const pageEventsDisplay = document.getElementById('pageEvents');
+
+        window.addEventListener('load', () => {
+            logEvent(pageEventsDisplay, 'Page fully loaded');
+        });
+
+        window.addEventListener('resize', () => {
+            logEvent(pageEventsDisplay, 
+                `Window resized to: ${window.innerWidth}×${window.innerHeight}`);
+        });
+
+        window.addEventListener('scroll', () => {
+            // Throttle scroll events
+            if (!window.scrollTimeout) {
+                logEvent(pageEventsDisplay, 
+                    `Scrolled to: ${window.scrollY}px from top`);
+                window.scrollTimeout = setTimeout(() => {
+                    window.scrollTimeout = null;
+                }, 200);
+            }
+        });
+
+        document.getElementById('resizeBtn').addEventListener('click', () => {
+            window.dispatchEvent(new Event('resize'));
+        });
+
+        document.getElementById('scrollBtn').addEventListener('click', () => {
+            window.scrollTo(0, document.body.scrollHeight);
+        });
+
+        // ========== Timer & Redirect ==========
+        const countdownElement = document.getElementById('countdown');
+        const timerEventsDisplay = document.getElementById('timerEvents');
+        let countdown = 5;
+        let redirectTimer;
+
+        function startCountdown() {
+            logEvent(timerEventsDisplay, 'Countdown started (5 seconds)');
+            redirectTimer = setInterval(() => {
+                countdown--;
+                countdownElement.textContent = countdown;
+                
+                if (countdown <= 0) {
+                    clearInterval(redirectTimer);
+                    logEvent(timerEventsDisplay, 'Redirecting now...');
+                    // In a real scenario, you would redirect:
+                    // window.location.href = 'https://example.com';
+                    logEvent(timerEventsDisplay, 'Redirect would happen here (commented out for demo)');
+                    countdownElement.textContent = 'Redirect!';
+                }
+            }, 1000);
+        }
+
+        document.getElementById('cancelRedirect').addEventListener('click', () => {
+            clearInterval(redirectTimer);
+            logEvent(timerEventsDisplay, 'Redirect cancelled');
+            countdownElement.textContent = 'Cancelled';
+        });
+
+        // Start countdown after page loads
+        window.addEventListener('load', startCountdown);
+
+        // ========== Utility Function ==========
+        function logEvent(element, message) {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString();
+            const eventEntry = document.createElement('div');
+            eventEntry.textContent = `[${timeString}] ${message}`;
+            element.prepend(eventEntry);
+            
+            // Keep only the last 5 events visible
+            while (element.children.length > 5) {
+                element.removeChild(element.lastChild);
+            }
+        }
+    </script>
+</body>
+</html>
